@@ -68,12 +68,14 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	@Override
 	public Document loadDocument(InputSource inputSource, EntityResolver entityResolver,
 			ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception {
-
+		// 参加 DocumentBuilderFactory
 		DocumentBuilderFactory factory = createDocumentBuilderFactory(validationMode, namespaceAware);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Using JAXP provider [" + factory.getClass().getName() + "]");
 		}
+		// 参加 createDocumentBuilder
 		DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
+		// 解析  xml inputSource 返回 document
 		return builder.parse(inputSource);
 	}
 
@@ -87,14 +89,18 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	 */
 	protected DocumentBuilderFactory createDocumentBuilderFactory(int validationMode, boolean namespaceAware)
 			throws ParserConfigurationException {
-
+		// 参加一个单例的 DocumentBuilderFactory
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		// 设置命名空间
 		factory.setNamespaceAware(namespaceAware);
-
+		// 如果有校验方式，则执行下面代码
 		if (validationMode != XmlValidationModeDetector.VALIDATION_NONE) {
+			// 开启校验
 			factory.setValidating(true);
+			// 如果检验方式 xsd 则设置 factory苏醒
 			if (validationMode == XmlValidationModeDetector.VALIDATION_XSD) {
 				// Enforce namespace aware for XSD...
+				// xsd 模式下，强制设置命名空间支持
 				factory.setNamespaceAware(true);
 				try {
 					factory.setAttribute(SCHEMA_LANGUAGE_ATTRIBUTE, XSD_SCHEMA_LANGUAGE);
@@ -127,12 +133,14 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	protected DocumentBuilder createDocumentBuilder(DocumentBuilderFactory factory,
 			@Nullable EntityResolver entityResolver, @Nullable ErrorHandler errorHandler)
 			throws ParserConfigurationException {
-
+		// 创建 DocumentBuilder 对象
 		DocumentBuilder docBuilder = factory.newDocumentBuilder();
 		if (entityResolver != null) {
+			// 设置  entityResolver（解析器） 属性
 			docBuilder.setEntityResolver(entityResolver);
 		}
 		if (errorHandler != null) {
+			// 设置 errorHandler（处理加载 Document 对象的过程的错误） 属性
 			docBuilder.setErrorHandler(errorHandler);
 		}
 		return docBuilder;
